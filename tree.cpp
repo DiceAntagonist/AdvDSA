@@ -1,53 +1,73 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 class Node {
 public:
     int value;
-    Node* left;
-    Node* right;
+    vector<Node*> children; // General tree allows multiple children
 
     Node(int val) {
         value = val;
-        left = nullptr;
-        right = nullptr;
     }
 };
 
 class Tree {
     Node* root;
 
-    Node* insertNode(Node* current, int value) {
-        if (current == nullptr)
-            return new Node(value);
+    Node* insertNode(Node* current, int parentValue, int value) {
+        if (current == nullptr) {
+            return nullptr;
+        }
 
-        if (value < current->value)
-            current->left = insertNode(current->left, value);
-        else if (value > current->value)
-            current->right = insertNode(current->right, value);
+        // If the parent is found, add the new node as its child
+        if (current->value == parentValue) {
+            Node* newNode = new Node(value);
+            current->children.push_back(newNode);
+            return current;
+        }
 
-        return current;
+        // Recursively check in all children
+        for (Node* child : current->children) {
+            Node* result = insertNode(child, parentValue, value);
+            if (result != nullptr) {
+                return result;
+            }
+        }
+
+        return nullptr;
     }
 
     bool searchNode(Node* current, int value) {
-        if (current == nullptr)
+        if (current == nullptr) {
             return false;
+        }
 
-        if (current->value == value)
+        if (current->value == value) {
             return true;
+        }
 
-        if (value < current->value)
-            return searchNode(current->left, value);
-        return searchNode(current->right, value);
+        // Recursively search in all children
+        for (Node* child : current->children) {
+            if (searchNode(child, value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    void inOrderTraversal(Node* current) {
-        if (current == nullptr)
+    void traverseNode(Node* current) {
+        if (current == nullptr) {
             return;
+        }
 
-        inOrderTraversal(current->left);
-        cout << current->value << " ";
-        inOrderTraversal(current->right);
+        cout << current->value << " "; // Visit the current node
+
+        // Traverse all children
+        for (Node* child : current->children) {
+            traverseNode(child);
+        }
     }
 
 public:
@@ -55,8 +75,16 @@ public:
         root = nullptr;
     }
 
-    void insert(int value) {
-        root = insertNode(root, value);
+    void insert(int parentValue, int value) {
+        if (root == nullptr) {
+            // If the tree is empty, create the root node
+            root = new Node(parentValue);
+            if (parentValue != value) {
+                root->children.push_back(new Node(value));
+            }
+        } else {
+            insertNode(root, parentValue, value);
+        }
     }
 
     bool search(int value) {
@@ -64,13 +92,14 @@ public:
     }
 
     void traverse() {
-        inOrderTraversal(root);
+        traverseNode(root);
+        cout << endl;
     }
 };
 
 int main() {
     Tree tree;
-    int choice, value;
+    int choice, parentValue, value;
 
     do {
         cout << "\n1. Insert\n2. Search\n3. Traverse\n4. Exit\nEnter your choice: ";
@@ -78,9 +107,11 @@ int main() {
 
         switch (choice) {
             case 1:
+                cout << "Enter parent value (or root value if tree is empty): ";
+                cin >> parentValue;
                 cout << "Enter value to insert: ";
                 cin >> value;
-                tree.insert(value);
+                tree.insert(parentValue, value);
                 break;
             case 2:
                 cout << "Enter value to search: ";
@@ -91,9 +122,8 @@ int main() {
                     cout << "Value not found in the tree.";
                 break;
             case 3:
-                cout << "Tree (in-order traversal): ";
+                cout << "Tree (traversal): ";
                 tree.traverse();
-                cout << endl;
                 break;
             case 4:
                 cout << "Exiting..." << endl;
