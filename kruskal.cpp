@@ -46,11 +46,6 @@ public:
         }
     }
 
-    // Destructor: Free dynamically allocated memory
-    ~DSU() {
-        delete[] parent;
-        delete[] rank;
-    }
 };
 
 // Graph class to represent the graph and implement Kruskal's Algorithm
