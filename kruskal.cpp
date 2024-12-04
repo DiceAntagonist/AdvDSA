@@ -46,9 +46,10 @@ public:
         }
     }
 
+
 };
 
-// Graph class to represent the graph and implement Kruskal's Algorithm
+
 class Graph {
     vector<vector<int>> edgelist; // Stores edges in the format {weight, vertex1, vertex2}
     int V;                        // Number of vertices
@@ -64,7 +65,7 @@ public:
         edgelist.push_back({w, x, y});
     }
 
-    // Kruskal's algorithm to find the Minimum Spanning Tree (MST)
+   
     void kruskals_mst() {
         // Sort edges by weight
         sort(edgelist.begin(), edgelist.end());
